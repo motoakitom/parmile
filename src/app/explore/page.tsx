@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { IoRefreshOutline, IoShuffleOutline } from "react-icons/io5";
+import { IoShuffleOutline } from "react-icons/io5";
 import SwipeCard from "@/components/swipe-card";
 import ProductDetailModal from "@/components/product-detail-modal";
 import ProductFilter from "@/components/product-filter";

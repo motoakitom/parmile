@@ -4,10 +4,9 @@ import { useState } from "react";
 import Image from "next/image";
 import { useDrag } from "@use-gesture/react";
 import { animated, useSpring } from "@react-spring/web";
-import { Card, CardContent } from "@/components/ui/card";
-import { IoHeartOutline, IoCloseOutline, IoImageOutline, IoRefreshOutline } from "react-icons/io5";
+import { Card } from "@/components/ui/card";
+import { IoHeartOutline, IoCloseOutline, IoImageOutline } from "react-icons/io5";
 import { Product } from "@/data/sample-products";
-import useProductStore from "@/lib/store";
 
 interface SwipeCardProps {
   product: Product;
@@ -56,7 +55,11 @@ export default function SwipeCard({ product, onLike, onDislike, onShowDetails, o
             y: 0,
             rotate: isRight ? 30 : -30,
             onResolve: () => {
-              isRight ? onLike() : onDislike();
+              if (isRight) {
+                onLike();
+              } else {
+                onDislike();
+              }
             }
           });
         // 条件に達していない場合は元の位置に戻る

@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { Product, products as sampleProducts } from "@/data/sample-products";
-import { externalProducts, getRandomizedProducts } from "@/lib/product-fetcher";
+import { Product } from "@/data/sample-products";
+import { getRandomizedProducts } from "@/lib/product-fetcher";
 
 interface ProductState {
   products: Product[];
@@ -37,7 +37,7 @@ const useProductStore = create<ProductState>()(
       lastAction: null,
       
       likeProduct: (id: string) => {
-        const { products, currentIndex, viewedProducts } = get();
+        const { products } = get();
         const product = products.find(p => p.id === id);
         
         if (product) {
