@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useDrag } from "@use-gesture/react";
 import { animated, useSpring } from "@react-spring/web";
 import { Card } from "@/components/ui/card";
-import { IoHeartOutline, IoCloseOutline, IoImageOutline } from "react-icons/io5";
+import { IoHeartOutline, IoCloseOutline, IoImageOutline, IoRefreshOutline } from "react-icons/io5";
 import { Product } from "@/data/sample-products";
 
 interface SwipeCardProps {

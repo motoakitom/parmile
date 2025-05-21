@@ -145,7 +145,7 @@ export function getRandomizedProducts(): Product[] {
 }
 
 // ユーザーの好みに基づいて商品を並び替える関数（将来的な拡張用）
-export function getPersonalizedProducts(_userId: string, _preferences: string[]): Product[] {
+export function getPersonalizedProducts(): Product[] {
   // TODO: ユーザーの好みに基づいて商品をソートするロジックを実装
   // 現時点ではランダムに返す
   return getRandomizedProducts();
