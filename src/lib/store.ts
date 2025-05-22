@@ -7,15 +7,13 @@ interface ProductState {
   products: Product[];
   currentIndex: number;
   likedProducts: Product[];
-  viewedProducts: string[];
-  filterBrands: string[];
+  viewedProducts: Array<{ id: string; timestamp: number }>;
   lastAction: { type: string; product: Product | undefined } | null;
   
   // アクション
   likeProduct: (id: string) => void;
   dislikeProduct: (id: string) => void;
   undoLastAction: () => void;
-  setFilterBrands: (brands: string[]) => void;
   removeLikedProduct: (id: string) => void;
   shuffleProducts: () => void;
 }
@@ -33,17 +31,17 @@ const useProductStore = create<ProductState>()(
       currentIndex: 0,
       likedProducts: [],
       viewedProducts: [],
-      filterBrands: [],
       lastAction: null,
       
       likeProduct: (id: string) => {
         const { products } = get();
         const product = products.find(p => p.id === id);
+        const timestamp = Date.now();
         
         if (product) {
           set(state => ({
             likedProducts: [...state.likedProducts, product],
-            viewedProducts: [...state.viewedProducts, id],
+            viewedProducts: [...state.viewedProducts, { id, timestamp }],
             currentIndex: state.currentIndex + 1,
             lastAction: { type: 'like', product }
           }));
@@ -52,8 +50,9 @@ const useProductStore = create<ProductState>()(
       
       dislikeProduct: (id: string) => {
         const { products } = get();
+        const timestamp = Date.now();
         set(state => ({
-          viewedProducts: [...state.viewedProducts, id],
+          viewedProducts: [...state.viewedProducts, { id, timestamp }],
           currentIndex: state.currentIndex + 1,
           lastAction: { type: 'dislike', product: products.find(p => p.id === id) }
         }));
@@ -63,11 +62,11 @@ const useProductStore = create<ProductState>()(
         const { viewedProducts, likedProducts, currentIndex } = get();
         
         if (currentIndex > 0 && viewedProducts.length > 0) {
-          const lastViewedId = viewedProducts[viewedProducts.length - 1];
+          const lastViewed = viewedProducts[viewedProducts.length - 1];
           const newViewedProducts = viewedProducts.slice(0, -1);
           
           // 最後にいいねした商品を取り消す場合
-          const likedProductIndex = likedProducts.findIndex(p => p.id === lastViewedId);
+          const likedProductIndex = likedProducts.findIndex(p => p.id === lastViewed.id);
           const newLikedProducts = likedProductIndex !== -1 
             ? likedProducts.filter((_, i) => i !== likedProductIndex)
             : likedProducts;
@@ -78,10 +77,6 @@ const useProductStore = create<ProductState>()(
             currentIndex: currentIndex - 1
           });
         }
-      },
-      
-      setFilterBrands: (brands: string[]) => {
-        set({ filterBrands: brands });
       },
       
       removeLikedProduct: (id: string) => {
@@ -99,6 +94,22 @@ const useProductStore = create<ProductState>()(
     }),
     {
       name: "parmile-storage",
+      version: 1,
+      migrate: (persistedState: any, version) => {
+        // バージョン0（初期バージョン）から1へのマイグレーション
+        if (version === 0) {
+          const state = persistedState as any;
+          // viewedProductsが文字列配列の場合、オブジェクト配列に変換
+          if (state.viewedProducts && state.viewedProducts.length > 0 && typeof state.viewedProducts[0] === 'string') {
+            state.viewedProducts = (state.viewedProducts as string[]).map(id => ({
+              id,
+              timestamp: Date.now()
+            }));
+          }
+          return state;
+        }
+        return persistedState;
+      },
       storage: isClient ? createJSONStorage(() => localStorage) : undefined,
       skipHydration: true,
     }

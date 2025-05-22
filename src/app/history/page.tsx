@@ -24,8 +24,11 @@ export default function HistoryPage() {
   const historyItems = viewedProducts
     .slice()
     .reverse()
-    .map(id => products.find(p => p.id === id))
-    .filter(Boolean) as Product[];
+    .map(item => {
+      const product = products.find(p => p.id === item.id);
+      return product ? { ...product, viewTimestamp: item.timestamp } : null;
+    })
+    .filter(Boolean) as (Product & { viewTimestamp: number })[];
   
   const handleShowDetails = (product: Product) => {
     setModalProduct(product);
@@ -52,53 +55,74 @@ export default function HistoryPage() {
   };
 
   return (
-    <div className="p-4">
-      <header className="mb-4">
-        <h1 className="text-2xl font-bold">閲覧履歴</h1>
-        <p className="text-muted-foreground">{historyItems.length}件のアイテム</p>
+    <div className="p-4 pb-24">
+      <header className="mb-6">
+        <h1 className="text-2xl font-bold mb-1">閲覧履歴</h1>
+        <p className="text-muted-foreground text-sm">合計 {historyItems.length}件</p>
       </header>
 
       {historyItems.length > 0 ? (
-        <div className="grid grid-cols-2 gap-4">
-          {historyItems.map(product => (
-            <Card key={product.id} className="overflow-hidden">
-              <div className="relative h-48">
-                {!imageErrors[product.id] ? (
-                  <Image
-                    src={product.images[0]}
-                    alt={product.name}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 640px) 50vw, 33vw"
-                    onClick={() => handleShowDetails(product)}
-                    onError={() => handleImageError(product.id)}
-                  />
-                ) : (
-                  <div 
-                    className="w-full h-full flex items-center justify-center bg-gray-100"
-                    onClick={() => handleShowDetails(product)}
-                  >
-                    <IoImageOutline size={32} className="text-gray-400" />
-                  </div>
-                )}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute top-1 right-1 bg-white/70 h-8 w-8 rounded-full"
-                  onClick={() => toggleLike(product.id)}
-                >
-                  {isLiked(product.id) ? (
-                    <IoHeart size={18} className="text-red-500" />
+        <div className="space-y-4">
+          {historyItems.map((product, index) => (
+            <Card 
+              key={`${product.id}-${product.viewTimestamp}-${index}`} 
+              className="overflow-hidden hover:shadow-md transition-shadow"
+            >
+              <div className="flex flex-row">
+                <div className="relative w-24 h-24 flex-shrink-0 flex items-center justify-center bg-gray-50">
+                  {!imageErrors[product.id] ? (
+                    <div className="relative w-full h-full flex items-center justify-center">
+                      <Image
+                        src={product.images[0]}
+                        alt={product.name}
+                        width={96}
+                        height={96}
+                        className="max-h-full max-w-full"
+                        style={{
+                          objectFit: 'contain',
+                          width: 'auto',
+                          height: 'auto',
+                          maxWidth: '100%',
+                          maxHeight: '100%'
+                        }}
+                        onClick={() => handleShowDetails(product)}
+                        onError={() => handleImageError(product.id)}
+                      />
+                    </div>
                   ) : (
-                    <IoHeartOutline size={18} />
+                    <div 
+                      className="w-full h-full flex items-center justify-center bg-gray-50"
+                      onClick={() => handleShowDetails(product)}
+                    >
+                      <IoImageOutline size={24} className="text-gray-300" />
+                    </div>
                   )}
-                </Button>
+                </div>
+                <div className="flex-1 p-3 flex flex-col justify-between">
+                  <div>
+                    <h3 className="font-medium text-sm line-clamp-2">{product.name}</h3>
+                    <p className="text-xs text-muted-foreground">{product.brand}</p>
+                  </div>
+                  <div className="flex justify-between items-center mt-2">
+                    <p className="text-sm font-bold">¥{product.price.toLocaleString()}</p>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 rounded-full"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleLike(product.id);
+                      }}
+                    >
+                      {isLiked(product.id) ? (
+                        <IoHeart size={18} className="text-red-500" />
+                      ) : (
+                        <IoHeartOutline size={18} />
+                      )}
+                    </Button>
+                  </div>
+                </div>
               </div>
-              <CardContent className="p-3">
-                <h3 className="font-medium text-sm line-clamp-1">{product.name}</h3>
-                <p className="text-xs text-muted-foreground">{product.brand}</p>
-                <p className="text-sm font-bold mt-1">¥{product.price.toLocaleString()}</p>
-              </CardContent>
             </Card>
           ))}
         </div>

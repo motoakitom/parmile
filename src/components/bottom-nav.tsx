@@ -35,7 +35,7 @@ export default function BottomNav() {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 h-16 bg-background border-t flex justify-around items-center z-50">
+    <nav className="fixed bottom-0 left-0 right-0 h-16 bg-background border-t flex justify-around items-center z-50" data-component-name="BottomNav">
       {navItems.map((item) => {
         const isActive = pathname === item.href;
         
@@ -46,6 +46,7 @@ export default function BottomNav() {
             className={`flex flex-col items-center justify-center w-1/4 h-full ${
               isActive ? "text-primary" : "text-muted-foreground"
             }`}
+            data-component-name="BottomNavItem"
           >
             <div>
               {isActive ? item.iconFilled : item.iconOutline}
@@ -54,6 +55,6 @@ export default function BottomNav() {
           </Link>
         );
       })}
-    </div>
+    </nav>
   );
 } 

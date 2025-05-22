@@ -34,53 +34,67 @@ export default function LikesPage() {
   };
 
   return (
-    <div className="p-4">
+    <div className="p-4 pb-24">
       <header className="mb-4">
         <h1 className="text-2xl font-bold">お気に入り</h1>
         <p className="text-muted-foreground">{likedProducts.length}件のアイテム</p>
       </header>
 
       {likedProducts.length > 0 ? (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-4">
           {likedProducts.map(product => (
             <Card key={product.id} className="overflow-hidden">
-              <div className="relative h-48">
-                {!imageErrors[product.id] ? (
-                  <Image
-                    src={product.images[0]}
-                    alt={product.name}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 640px) 50vw, 33vw"
-                    onClick={() => handleShowDetails(product)}
-                    onError={() => handleImageError(product.id)}
-                  />
-                ) : (
-                  <div 
-                    className="w-full h-full flex items-center justify-center bg-gray-100"
-                    onClick={() => handleShowDetails(product)}
-                  >
-                    <IoImageOutline size={32} className="text-gray-400" />
-                  </div>
-                )}
-              </div>
-              <CardContent className="p-3">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-medium text-sm line-clamp-1">{product.name}</h3>
-                    <p className="text-xs text-muted-foreground">{product.brand}</p>
-                    <p className="text-sm font-bold mt-1">¥{product.price.toLocaleString()}</p>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={() => handleRemove(product.id)}
-                  >
-                    <IoTrashOutline size={16} />
-                  </Button>
+              <div className="flex flex-row">
+                <div className="relative w-24 h-24 flex-shrink-0 flex items-center justify-center bg-gray-50">
+                  {!imageErrors[product.id] ? (
+                    <div className="relative w-full h-full flex items-center justify-center">
+                      <Image
+                        src={product.images[0]}
+                        alt={product.name}
+                        width={96}
+                        height={96}
+                        className="max-h-full max-w-full"
+                        style={{
+                          objectFit: 'contain',
+                          width: 'auto',
+                          height: 'auto',
+                          maxWidth: '100%',
+                          maxHeight: '100%'
+                        }}
+                        onClick={() => handleShowDetails(product)}
+                        onError={() => handleImageError(product.id)}
+                      />
+                    </div>
+                  ) : (
+                    <div 
+                      className="w-full h-full flex items-center justify-center bg-gray-50"
+                      onClick={() => handleShowDetails(product)}
+                    >
+                      <IoImageOutline size={24} className="text-gray-300" />
+                    </div>
+                  )}
                 </div>
-              </CardContent>
+                <div className="flex-1 p-3 flex flex-col justify-between">
+                  <div>
+                    <h3 className="font-medium text-sm line-clamp-2">{product.name}</h3>
+                    <p className="text-xs text-muted-foreground">{product.brand}</p>
+                  </div>
+                  <div className="flex justify-between items-center mt-2">
+                    <p className="text-sm font-bold">¥{product.price.toLocaleString()}</p>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemove(product.id);
+                      }}
+                    >
+                      <IoTrashOutline size={16} />
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </Card>
           ))}
         </div>
